@@ -1,59 +1,38 @@
 import data from './reportsWithKeywords.json';
+// import levenstein from "./libs/levenshtein";
+import SearchInit from "./Search.js";
+import MatchSearch from "./MatchSearch.js";
+import LevenshteinSearch from "./LevenshteinSearch.js";
 
-const dataFieldsWeightConfig = {
-    name: 0.5,
-    category: 0.3,
-    keywords: 0.2
-};
-
-const searchStringWeight = (query, string) => {
-    const regFullSearch = new RegExp(query.toLowerCase(), 'gi');
-    const fullSearchWeight = (string.match(regFullSearch) || []).length;
-    const delimiter = /\s|,|\.|;|:/;
-
-    if(fullSearchWeight === 0) {
-        const searchWords = query.split(delimiter).filter(i => i.replace(delimiter).trim().length > 1);
-        if (searchWords.length > 1) {
-            const perWordWeight = 1 / (searchWords.length || 1);
-            const regWords = new RegExp(searchWords.join('|').toLowerCase(), 'gi');
-            const wordsWeight = (string.match(regWords) || []).length * perWordWeight;
-
-            return wordsWeight + fullSearchWeight;
+const dataFieldsWeightConfig = [
+    {
+        key: 'name',
+        weight: 0.5,
+    },
+        {
+            key: 'category',
+            weight: 0.3,
+        },
+        {
+            key: 'keywords',
+            weight: 0.2
         }
-    }
-    return fullSearchWeight;
-}
+    ];
 
+function search(query, data) {
 
-function search(query, data, levenshteinEngine = true) {
-    console.log();
-    const resultItems = data.map((item, index) => {
-        const propsWeight = Object
-            .entries(dataFieldsWeightConfig)
-            .map(([prop, propWeight]) => {
-                return {
-                    prop,
-                    weight: searchStringWeight(query, item[prop].toString()) * propWeight
-                };
-            });
-        const weight = propsWeight.reduce((sum, {weight}) => sum+weight, 0);
+    const searchEngine = new SearchInit(data, {
+        fields: dataFieldsWeightConfig,
+        caseSensitive: false
+    })
+    searchEngine.addSearchModule(MatchSearch, {minNeedleWordLength: 3})
+    // searchEngine.addSearchModule(LevenshteinSearch, {minNeedleWordLength: 3})
+    const result = searchEngine.search(query);
 
-        if(weight > 0) {
-            console.log(index, propsWeight)
-        }
-        return {index, propsWeight, weight};
-    }).filter(i=>i.weight);
-
-    // console.log('ranged', [...resultItems]);
-
-    resultItems.sort((itemLeft, itemRight) => {
-        return itemLeft.weight > itemRight.weight ? -1 : 1;
-    });
-
-    console.log('ranged & sorted', resultItems);
-
-    return resultItems;
+    result.forEach((item, i) => {
+        console.log(i, item.name, item.__searchMetadata.weight);
+    })
 }
 
 // console.log(data.reports);
-search('bone density', data.reports)
+search('pitch perfect', data.reports)
