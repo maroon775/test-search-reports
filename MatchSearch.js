@@ -2,7 +2,7 @@ import BaseModuleSearch from "./BaseModuleSearch.js";
 
 
 class MatchSearch extends BaseModuleSearch {
-    options = {
+    defaultOptions = {
         minNeedleWordLength: 2
     }
     getScore() {
@@ -10,8 +10,8 @@ class MatchSearch extends BaseModuleSearch {
     }
     search(needleWords, haystackWords) {
         const needleWordsFiltered = needleWords.filter(i => this.options.minNeedleWordLength <= i.length);
-        // const wordWeight = 1/haystackWords.length;
-        const wordWeight = 1/needleWords.length;
+        const wordWeight = 1/haystackWords.length;
+        // const wordWeight = 1/needleWords.length;
 
 
         const scores = needleWordsFiltered.map(needle => {

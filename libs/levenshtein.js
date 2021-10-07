@@ -8,7 +8,7 @@ function _min(d0, d1, d2, bx, ay) {
             : d1 + 1;
 }
 
-export default function (a, b) {
+export default function levenshtein (a, b) {
     if (a === b) {
         return 0;
     }

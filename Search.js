@@ -40,12 +40,13 @@ class SearchInit {
         return Array
             .from(dataItems)
             .map(row => {
-                row.__searchMetadata = {};
+                row.__searchMetadata = {score: 0};
                 for (let i = 0; i < fields.length; i++) {
                     const fieldName = fields[i].key;
                     row.__searchMetadata[fieldName] = {
                         words: [],
-                        weight: 0
+                        score: 0,
+                        scoringResult: {}
                     }
                     const fieldData = row[fieldName];
                     let dataset;
@@ -72,36 +73,65 @@ class SearchInit {
         this.__queryset = stringToArray(queryString, 1);
 
         this.__dataset.forEach(item => {
-            let itemWeight = 0;
             fields.forEach(field => {
                 const itemFieldMetadata = item.__searchMetadata[field.key];
-                const words = itemFieldMetadata.words;
 
-                const scores = [];
-                this.__modules.forEach(moduleInstance => {
-                    moduleInstance.search(this.__queryset, words);
-                    const score = moduleInstance.getScore();
-                    scores.push(score);
-                });
+                const scoringResult = this.totalScoringModules(itemFieldMetadata.words, field.weight);
+                itemFieldMetadata.scoringResult = scoringResult;
+                itemFieldMetadata.score = scoringResult.score;
 
-                itemFieldMetadata.weight = scores.reduce((a, i) => a+i, 0) * field.weight;
-
-                itemWeight +=itemFieldMetadata.weight;
+                item.__searchMetadata.score += itemFieldMetadata.score;
             });
 
-            item.__searchMetadata.weight = itemWeight;
-        });
-        this.__dataset.sort((itemL, itemR) => {
-            return itemL.__searchMetadata.weight > itemR.__searchMetadata.weight ? -1 : 1;
         });
 
+        this.__dataset.sort(this.flatSort);
+
+        const sliceIndex = this.__dataset.findIndex(i => i.__searchMetadata.score === 0);
+        this.__dataset.splice(sliceIndex); // cut with zero score;
+
+
         return this.__dataset;
+    }
+
+    totalScoringModules(haystack, weight) {
+        const result = {score: 0, modules: {}};
+        this.__modules.forEach((module)=> {
+            module.instance.search(this.__queryset, haystack);
+            const score = module.instance.getScore() * weight;
+
+            result.score += score;
+            result.modules[module.name] = score;
+        });
+
+        return result;
+    }
+
+    /*modulesSort(itemL, itemR) {
+        let sortValue = 0;
+        for(let i = 0, l = this.__modules.length; i < l && sortValue === 0; i++) {
+            const  mod = this.__modules[i];
+            const a = itemL.__searchMetadata.scoringResult.modules[mod.name],
+                b = itemR.__searchMetadata.scoringResult.modules[mod.name];
+
+                if( a === b ) sortValue = 0;
+                sortValue = a > b ? -1 : 1;
+        }
+        return sortValue;
+    }*/
+
+    flatSort(itemL, itemR) {
+        const a = itemL.__searchMetadata.score,
+            b = itemR.__searchMetadata.score;
+
+        if( a === b ) return 0;
+        return a > b ? -1 : 1;
     }
 
 
     addSearchModule(module, options = {}) {
         const instance = new module(options);
-        this.__modules.push(instance);
+        this.__modules.push({instance, name: module.name});
     }
 }
 

@@ -1,16 +1,16 @@
 class BaseModuleSearch {
-    options = {};
+    defaultOptions = {};
     lastSearchScore = 0;
 
     constructor(options) {
-        this.options = options;
+        this.options = {...this.defaultOptions, ...options};
     }
     search() {
-        return new Error('search() should be implemented')
+        throw new Error('search() should be implemented');
     }
 
     getScore() {
-        return new Error('getScore() should be implemented')
+        throw new Error('getScore() should be implemented');
     }
 }
 
