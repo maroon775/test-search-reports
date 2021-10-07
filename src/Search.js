@@ -90,10 +90,7 @@ class SearchInit {
         this.__dataset.sort(this.flatSort);
 
         const sliceIndex = this.__dataset.findIndex(i => i.__searchMetadata.score === 0);
-        this.__dataset.splice(sliceIndex); // cut with zero score;
-
-
-        return this.__dataset;
+        return this.__dataset.slice(0, sliceIndex-1); // cut with zero score;
     }
 
     totalScoringModules(haystack, weight) {
