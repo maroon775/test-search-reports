@@ -42,4 +42,4 @@ const result = search('sleep', data.reports, [
 console.log('#', '|', 'ID', '|', 'name', '|', 'score');
 result.forEach((item, i) => {
     console.log(i, '|', item.id, '|', item.name, '|', item.__searchMetadata.score);
-})
+});
