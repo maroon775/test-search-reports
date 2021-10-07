@@ -69,6 +69,8 @@ class SearchInit {
     }
 
     search(queryString) {
+        if(!queryString) return this.__dataset;
+
         const {fields} = this.__options;
         this.__queryset = stringToArray(queryString, 1);
 
