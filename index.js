@@ -29,15 +29,17 @@ function search(query, data, searchStrategies = []) {
     searchStrategies.forEach(strategy => {
         searchEngine.addSearchModule(strategy.module, strategy.options);
     });
-    const result = searchEngine.search(query);
+
+
+    return searchEngine.search(query);
 }
 
-// console.log(data.reports);
 const result = search('sleep', data.reports, [
     {module: MatchSearch, options: {minNeedleWordLength: 3}},
     {module: LevenshteinSearch, options: {minNeedleWordLength: 3, maxLevenshteinDistance: 2}},
-]);//[data.reports.find(({id}) => id === 25)])
+]);
 
+console.log('#', '|', 'ID', '|', 'name', '|', 'score');
 result.forEach((item, i) => {
-    console.log(i, item.id, item.name, item.__searchMetadata.score);
+    console.log(i, '|', item.id, '|', item.name, '|', item.__searchMetadata.score);
 })

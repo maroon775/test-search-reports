@@ -51,9 +51,9 @@ class SearchInit {
                     const fieldData = row[fieldName];
                     let dataset;
 
-                    // if (!fieldData) {
-                    //     continue;
-                    // }
+                    if (!fieldData) {
+                        continue;
+                    }
 
                     if (Array.isArray(fieldData)) {
                         dataset = fieldData.map((item) => {
