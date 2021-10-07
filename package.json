@@ -1,12 +1,24 @@
 {
-  "name": "levenshtein-search",
+  "name": "@levenshtein-search/levenshtein-search",
   "version": "1.1.0",
-  "description": "",
+  "description": "Run project with `node --experimental-json-modules ./example/example.js` Or: `npm run example`",
   "main": "src/index.js",
+  "module": "src/index.js",
   "scripts": {
     "example": "node --experimental-json-modules example/example.js"
   },
   "author": "",
   "type": "module",
-  "license": "ISC"
+  "license": "ISC",
+  "directories": {
+    "example": "example"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maroon775/test-search-reports.git"
+  },
+  "bugs": {
+    "url": "https://github.com/maroon775/test-search-reports/issues"
+  },
+  "homepage": "https://github.com/maroon775/test-search-reports#readme"
 }

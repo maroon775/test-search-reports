@@ -18,7 +18,7 @@ const fieldsMap = [
 
 
 
-const query = 'test';
+let query = 'test';
 
 const search = new Search(data.reports, {
     fields: fieldsMap,
@@ -28,15 +28,29 @@ const search = new Search(data.reports, {
 search.addSearchModule(MatchSearch, {minNeedleWordLength: 3});
 search.addSearchModule(LevenshteinSearch, {minNeedleWordLength: 3, maxLevenshteinDistance: 2});
 
-const result = search.search(query);
+let result = search.search(query);
 
 console.log('Results for query:', query);
-const table = [];
+let table = [];
 result.forEach((item, i) => {
     table.push({
         ID: item.id,
         name: item.name,
-        score: item.__searchMetadata.score
+        score: item.__scorings.score
+    });
+});
+console.table(table)
+
+query = 'medicine'
+result = search.search(query);
+
+console.log('Results for query:', query);
+table = [];
+result.forEach((item, i) => {
+    table.push({
+        ID: item.id,
+        name: item.name,
+        score: item.__scorings.score
     });
 });
 console.table(table)

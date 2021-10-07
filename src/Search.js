@@ -40,14 +40,10 @@ class SearchInit {
         return Array
             .from(dataItems)
             .map(row => {
-                row.__searchMetadata = {score: 0};
+                row.__datasets = {};
                 for (let i = 0; i < fields.length; i++) {
                     const fieldName = fields[i].key;
-                    row.__searchMetadata[fieldName] = {
-                        words: [],
-                        score: 0,
-                        scoringResult: {}
-                    }
+                    row.__datasets[fieldName] = []
                     const fieldData = row[fieldName];
                     let dataset;
 
@@ -62,7 +58,7 @@ class SearchInit {
                     } else if (typeof fieldData === 'string') {
                         dataset = stringToArray(caseSensitive ? fieldData : fieldData.toLowerCase());
                     }
-                    row.__searchMetadata[fieldName].words = dataset;
+                    row.__datasets[fieldName] = dataset;
                 }
                 return row;
             });
@@ -75,21 +71,31 @@ class SearchInit {
         this.__queryset = stringToArray(queryString, 1);
 
         this.__dataset.forEach(item => {
+            item.__scorings = {
+                score: 0,
+            };
             fields.forEach(field => {
-                const itemFieldMetadata = item.__searchMetadata[field.key];
+                const itemFieldDataset = item.__datasets[field.key];
+                const itemFieldScoring = {
+                    score: 0,
+                    scoringResult: {}
+                };
+                const scoringResult = this.totalScoringModules(itemFieldDataset, field.weight);
 
-                const scoringResult = this.totalScoringModules(itemFieldMetadata.words, field.weight);
-                itemFieldMetadata.scoringResult = scoringResult;
-                itemFieldMetadata.score = scoringResult.score;
-
-                item.__searchMetadata.score += itemFieldMetadata.score;
+                itemFieldScoring.scoringResult = scoringResult;
+                itemFieldScoring.score = scoringResult.score;
+                item.__scorings.score += itemFieldScoring.score;
+                item.__scorings[field.key] = itemFieldScoring;
             });
 
         });
 
         this.__dataset.sort(this.flatSort);
 
-        const sliceIndex = this.__dataset.findIndex(i => i.__searchMetadata.score === 0);
+        const sliceIndex = this.__dataset.findIndex(i => i.__scorings.score === 0);
+
+        if(sliceIndex === 0) return [];
+
         return this.__dataset.slice(0, sliceIndex-1); // cut with zero score;
     }
 
@@ -120,8 +126,8 @@ class SearchInit {
     }*/
 
     flatSort(itemL, itemR) {
-        const a = itemL.__searchMetadata.score,
-            b = itemR.__searchMetadata.score;
+        const a = itemL.__scorings.score,
+            b = itemR.__scorings.score;
 
         if( a === b ) return 0;
         return a > b ? -1 : 1;
