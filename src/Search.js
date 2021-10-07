@@ -70,7 +70,7 @@ class SearchInit {
         const {fields} = this.__options;
         this.__queryset = stringToArray(queryString, 1);
 
-        this.__dataset.forEach(item => {
+        const result = this.__dataset.map(item => {
             item.__scorings = {
                 score: 0,
             };
@@ -87,16 +87,16 @@ class SearchInit {
                 item.__scorings.score += itemFieldScoring.score;
                 item.__scorings[field.key] = itemFieldScoring;
             });
-
+            return item;
         });
 
-        this.__dataset.sort(this.flatSort);
+        result.sort(this.flatSort);
 
-        const sliceIndex = this.__dataset.findIndex(i => i.__scorings.score === 0);
+        const sliceIndex = result.findIndex(i => i.__scorings.score === 0);
 
         if(sliceIndex === 0) return [];
 
-        return this.__dataset.slice(0, sliceIndex-1); // cut with zero score;
+        return result.slice(0, sliceIndex-1); // cut with zero score;
     }
 
     totalScoringModules(haystack, weight) {
