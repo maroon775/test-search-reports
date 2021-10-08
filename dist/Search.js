@@ -1,6 +1,7 @@
 import stringToArray from './libs/stringToArray';
 class SearchInit {
     constructor(dataItems, options) {
+        this.modules = [];
         this.options = {
             caseSensitive: false,
             fields: [{

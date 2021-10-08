@@ -1,11 +1,11 @@
 import BaseSearch from './BaseSearch';
 import arraySumValues from './libs/arraySumValues';
 class MatchSearch extends BaseSearch {
-    constructor() {
-        super(...arguments);
-        this.defaultOptions = {
+    constructor(options) {
+        const defaultOptions = {
             minNeedleWordLength: 2,
         };
+        super(options, defaultOptions);
     }
     getScore() {
         return this.searchScore;

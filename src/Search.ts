@@ -60,7 +60,7 @@ interface ISearchInit {
 }
 
 class SearchInit implements ISearchInit {
-    modules!: ModuleInstance[];
+    modules: ModuleInstance[] = [];
 
     options: SearchInitOptions = {
         caseSensitive: false,

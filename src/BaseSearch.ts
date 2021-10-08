@@ -5,7 +5,6 @@ interface BaseSearchOptions {
 
 export interface IModuleSearch<T> {
   readonly options: T;
-  readonly defaultOptions: T;
 
   search(needleWords: string[], haystackWords: string[]): void
 
@@ -15,15 +14,14 @@ export interface IModuleSearch<T> {
 abstract class BaseSearch<T = BaseSearchOptions> implements IModuleSearch<T> {
   protected searchScore = 0;
 
-  readonly defaultOptions: T = <T>{};
 
   readonly options: T;
 
-  constructor(options: T) {
-    this.options = { ...this.defaultOptions, ...options };
+  constructor(options: T, defaultOptions: T) {
+    this.options = {...options , ...defaultOptions};
   }
 
-  search(needleWords: string[], haystackWords: string[]) {
+  search(needleWords: string[], haystackWords: string[]): void {
     throw new Error('search() should be implemented');
   }
 

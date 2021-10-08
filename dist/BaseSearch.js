@@ -1,8 +1,7 @@
 class BaseSearch {
-    constructor(options) {
+    constructor(options, defaultOptions) {
         this.searchScore = 0;
-        this.defaultOptions = {};
-        this.options = Object.assign(Object.assign({}, this.defaultOptions), options);
+        this.options = Object.assign(Object.assign({}, options), defaultOptions);
     }
     search(needleWords, haystackWords) {
         throw new Error('search() should be implemented');

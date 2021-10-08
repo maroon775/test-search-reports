@@ -2,36 +2,41 @@ import BaseSearch from './BaseSearch';
 import arraySumValues from './libs/arraySumValues';
 
 interface IMatchSearchOptions {
-  minNeedleWordLength: number,
+    minNeedleWordLength: number,
 }
+
 class MatchSearch extends BaseSearch<IMatchSearchOptions> {
-  defaultOptions = {
-    minNeedleWordLength: 2,
-  };
+    constructor(options: IMatchSearchOptions) {
+        const defaultOptions: IMatchSearchOptions = {
+            minNeedleWordLength: 2,
+        };
+        super(options, defaultOptions);
+    }
 
-  getScore() {
-    return this.searchScore;
-  }
+    getScore(): number {
+        return this.searchScore;
+    }
 
-  search(needleWords: string[], haystackWords: string[]) {
-    const needleWordsFiltered = needleWords.filter(i => this.options.minNeedleWordLength <= i.length);
-    const wordWeight = 1 / haystackWords.length;
+    search(needleWords: string[], haystackWords: string[]): void {
+        const needleWordsFiltered = needleWords.filter(i => this.options.minNeedleWordLength <= i.length);
+        const wordWeight = 1 / haystackWords.length;
 
-    const scores = needleWordsFiltered.map(needle => {
-      const needleScores = haystackWords.map((haystack) => {
-        if (needle.trim() === haystack.trim()) {
-          return wordWeight;
-        } if (haystack.includes(needle)) {
-          return wordWeight * (needle.length / haystack.length);
-        }
-        return 0;
-      });
+        const scores = needleWordsFiltered.map(needle => {
+            const needleScores = haystackWords.map((haystack) => {
+                if (needle.trim() === haystack.trim()) {
+                    return wordWeight;
+                }
+                if (haystack.includes(needle)) {
+                    return wordWeight * (needle.length / haystack.length);
+                }
+                return 0;
+            });
 
-      return arraySumValues(needleScores);
-    });
+            return arraySumValues(needleScores);
+        });
 
-    this.searchScore = arraySumValues(scores);
-  }
+        this.searchScore = arraySumValues(scores);
+    }
 }
 
 export default MatchSearch;

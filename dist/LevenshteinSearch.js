@@ -1,13 +1,13 @@
 import BaseSearch from './BaseSearch';
 import levenshtein from './libs/levenshtein';
 class LevenshteinSearch extends BaseSearch {
-    constructor() {
-        super(...arguments);
-        this.defaultOptions = {
+    constructor(options) {
+        const defaultOptions = {
             minNeedleWordLength: 2,
             maxLevenshteinDistance: 3,
             levenshtein,
         };
+        super(options, defaultOptions);
     }
     getScore() {
         return this.searchScore;
