@@ -43,6 +43,27 @@ class SearchInit {
             return row;
         });
     }
+    totalScoringModules(haystack, weight) {
+        const result = { score: 0, modules: {} };
+        this.modules.forEach((module) => {
+            module.instance.search(this.queryset, haystack);
+            const score = module.instance.getScore() * weight;
+            result.score += score;
+            result.modules[module.name] = score;
+        });
+        return result;
+    }
+    static flatSort(itemL, itemR) {
+        const a = itemL.__scorings.score;
+        const b = itemR.__scorings.score;
+        if (a === b)
+            return 0;
+        return a > b ? -1 : 1;
+    }
+    addSearchModule(Module, options) {
+        const instance = new Module(options);
+        this.modules.push({ instance, name: Module.name });
+    }
     search(queryString) {
         if (!queryString)
             return this.dataset;
@@ -60,32 +81,11 @@ class SearchInit {
             });
             return item;
         });
-        result.sort(this.flatSort);
+        result.sort(SearchInit.flatSort);
         const sliceIndex = result.findIndex(i => i.__scorings.score === 0);
         if (sliceIndex === 0)
             return [];
         return result.slice(0, sliceIndex - 1);
-    }
-    totalScoringModules(haystack, weight) {
-        const result = { score: 0, modules: {} };
-        this.modules.forEach((module) => {
-            module.instance.search(this.queryset, haystack);
-            const score = module.instance.getScore() * weight;
-            result.score += score;
-            result.modules[module.name] = score;
-        });
-        return result;
-    }
-    flatSort(itemL, itemR) {
-        const a = itemL.__scorings.score;
-        const b = itemR.__scorings.score;
-        if (a === b)
-            return 0;
-        return a > b ? -1 : 1;
-    }
-    addSearchModule(Module, options) {
-        const instance = new Module(options);
-        this.modules.push({ instance, name: Module.name });
     }
 }
 export default SearchInit;
