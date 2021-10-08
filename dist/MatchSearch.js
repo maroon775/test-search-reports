@@ -1,10 +1,10 @@
-import BaseSearch from "./BaseSearch";
-import arraySumValues from "./libs/arraySumValues";
+import BaseSearch from './BaseSearch';
+import arraySumValues from './libs/arraySumValues';
 class MatchSearch extends BaseSearch {
     constructor() {
         super(...arguments);
         this.defaultOptions = {
-            minNeedleWordLength: 2
+            minNeedleWordLength: 2,
         };
     }
     getScore() {
@@ -18,7 +18,7 @@ class MatchSearch extends BaseSearch {
                 if (needle.trim() === haystack.trim()) {
                     return wordWeight;
                 }
-                else if (haystack.includes(needle)) {
+                if (haystack.includes(needle)) {
                     return wordWeight * (needle.length / haystack.length);
                 }
                 return 0;

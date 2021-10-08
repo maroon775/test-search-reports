@@ -1,28 +1,30 @@
-function _min(d0, d1, d2, bx, ay) {
-    return d0 < d1 || d2 < d1
-        ? d0 > d2
+function min(d0, d1, d2, bx, ay) {
+    if (d0 < d1 || d2 < d1) {
+        return d0 > d2
             ? d2 + 1
-            : d0 + 1
-        : bx === ay
-            ? d1
-            : d1 + 1;
+            : d0 + 1;
+    }
+    return bx === ay
+        ? d1
+        : d1 + 1;
 }
-export default function levenshtein(a, b) {
-    if (a === b) {
+export default function levenshtein(needle, haystack) {
+    if (haystack === needle) {
         return 0;
     }
-    if (a.length > b.length) {
-        var tmp = a;
-        a = b;
-        b = tmp;
+    let a = needle;
+    let b = haystack;
+    if (needle.length > haystack.length) {
+        a = haystack;
+        b = needle;
     }
-    var la = a.length;
-    var lb = b.length;
+    let la = a.length;
+    let lb = b.length;
     while (la > 0 && (a.charCodeAt(la - 1) === b.charCodeAt(lb - 1))) {
         la--;
         lb--;
     }
-    var offset = 0;
+    let offset = 0;
     while (offset < la && (a.charCodeAt(offset) === b.charCodeAt(offset))) {
         offset++;
     }
@@ -31,38 +33,39 @@ export default function levenshtein(a, b) {
     if (la === 0 || lb < 3) {
         return lb;
     }
-    var x = 0;
-    var y;
-    var d0;
-    var d1;
-    var d2;
-    var d3;
-    var dd = 0;
-    var dy;
-    var ay;
-    var bx0;
-    var bx1;
-    var bx2;
-    var bx3;
-    var vector = [];
+    let x = 0;
+    let y;
+    let d0;
+    let d1;
+    let d2;
+    let d3;
+    let dd = 0;
+    let dy;
+    let ay;
+    let bx0;
+    let bx1;
+    let bx2;
+    let bx3;
+    const vector = [];
     for (y = 0; y < la; y++) {
         vector.push(y + 1);
         vector.push(a.charCodeAt(offset + y));
     }
-    var len = vector.length - 1;
+    const len = vector.length - 1;
     for (; x < lb - 3;) {
         bx0 = b.charCodeAt(offset + (d0 = x));
         bx1 = b.charCodeAt(offset + (d1 = x + 1));
         bx2 = b.charCodeAt(offset + (d2 = x + 2));
         bx3 = b.charCodeAt(offset + (d3 = x + 3));
-        dd = (x += 4);
+        x += 4;
+        dd = x;
         for (y = 0; y < len; y += 2) {
             dy = vector[y];
             ay = vector[y + 1];
-            d0 = _min(dy, d0, d1, bx0, ay);
-            d1 = _min(d0, d1, d2, bx1, ay);
-            d2 = _min(d1, d2, d3, bx2, ay);
-            dd = _min(d2, d3, dd, bx3, ay);
+            d0 = min(dy, d0, d1, bx0, ay);
+            d1 = min(d0, d1, d2, bx1, ay);
+            d2 = min(d1, d2, d3, bx2, ay);
+            dd = min(d2, d3, dd, bx3, ay);
             vector[y] = dd;
             d3 = d2;
             d2 = d1;
@@ -75,10 +78,10 @@ export default function levenshtein(a, b) {
         dd = ++x;
         for (y = 0; y < len; y += 2) {
             dy = vector[y];
-            vector[y] = dd = _min(dy, d0, dd, bx0, vector[y + 1]);
+            dd = min(dy, d0, dd, bx0, vector[y + 1]);
+            vector[y] = dd;
             d0 = dy;
         }
     }
     return dd;
 }
-;

@@ -1,14 +1,14 @@
-import stringToArray from "./libs/stringToArray";
+import stringToArray from './libs/stringToArray';
 class SearchInit {
     constructor(dataItems, options) {
         this.options = {
             caseSensitive: false,
             fields: [{
                     key: 'title',
-                    weight: 1
-                }]
+                    weight: 1,
+                }],
         };
-        if (!options.hasOwnProperty('fields')
+        if (!('fields' in options)
             || !Array.isArray(options.fields)
             || options.fields.length <= 0) {
             throw new Error('"fields" is required parameter');
@@ -33,9 +33,7 @@ class SearchInit {
                 }
                 if (Array.isArray(fieldData)) {
                     row.__datasets[key] = fieldData
-                        .map((item) => {
-                        return stringToArray(caseSensitive ? item : item.toLowerCase());
-                    })
+                        .map((item) => stringToArray(caseSensitive ? item : item.toLowerCase()))
                         .flat() || [];
                 }
                 else if (typeof fieldData === 'string') {
@@ -52,7 +50,7 @@ class SearchInit {
         const result = this.dataset.map(item => {
             item.__scorings = {
                 score: 0,
-                fields: {}
+                fields: {},
             };
             this.options.fields.forEach(field => {
                 const itemFieldDataset = item.__datasets[field.key];
@@ -79,14 +77,15 @@ class SearchInit {
         return result;
     }
     flatSort(itemL, itemR) {
-        const a = itemL.__scorings.score, b = itemR.__scorings.score;
+        const a = itemL.__scorings.score;
+        const b = itemR.__scorings.score;
         if (a === b)
             return 0;
         return a > b ? -1 : 1;
     }
-    addSearchModule(module, options) {
-        const instance = new module(options);
-        this.modules.push({ instance, name: module.name });
+    addSearchModule(Module, options) {
+        const instance = new Module(options);
+        this.modules.push({ instance, name: Module.name });
     }
 }
 export default SearchInit;
