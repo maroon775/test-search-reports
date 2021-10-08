@@ -1,4 +1,4 @@
-import Search, {MatchSearch, LevenshteinSearch} from "../src/index.js";
+import Search, {MatchSearch, LevenshteinSearch} from "../dist/index.js";
 import data from "./reportsWithKeywords.json";
 
 const fieldsMap = [

@@ -2,9 +2,12 @@
   "name": "@maroon775/levenshtein-search",
   "version": "1.1.3",
   "description": "Run project with `node --experimental-json-modules ./example/example.js` Or: `npm run example`",
-  "main": "src/index.js",
-  "module": "src/index.js",
+  "main": "src/index.ts",
+  "module": "src/index.ts",
   "scripts": {
+    "lint": "eslint src --ext .ts,.js --cache",
+    "build:ts": "tsc --pretty",
+    "start": "node .",
     "example": "node --experimental-json-modules example/example.js"
   },
   "author": "maroon775",
@@ -13,9 +16,6 @@
   "directories": {
     "example": "example"
   },
-  "dependencies": {
-
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/maroon775/test-search-reports.git"
@@ -23,5 +23,19 @@
   "bugs": {
     "url": "https://github.com/maroon775/test-search-reports/issues"
   },
-  "homepage": "https://github.com/maroon775/test-search-reports#readme"
+  "homepage": "https://github.com/maroon775/test-search-reports#readme",
+  "dependencies": {
+    "@types/node": "^16.10.3",
+    "@typescript-eslint/eslint-plugin": "^4.33.0",
+    "@typescript-eslint/parser": "^4.33.0",
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-airbnb-typescript": "^14.0.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.24.2",
+    "prettier": "^2.4.1"
+  },
+  "devDependencies": {
+    "typescript": "^4.4.3"
+  }
 }
