@@ -1,24 +1,21 @@
+type BaseSearchOptions = Record<string, any>;
+type BaseSearchDefaultOptions = BaseSearchOptions;
 
-interface BaseSearchOptions {
-  [key: string]: any
-}
-
-export interface IModuleSearch<T> {
-  readonly options: T;
+export interface IModuleSearch<T, S> {
+  readonly options:  S | (T & S) | Record<string, any>;
 
   search(needleWords: string[], haystackWords: string[]): void
 
   getScore(): number;
 }
 
-abstract class BaseSearch<T = BaseSearchOptions> implements IModuleSearch<T> {
+abstract class BaseSearch<T = BaseSearchOptions, S = BaseSearchDefaultOptions> implements IModuleSearch<T, S> {
   protected searchScore = 0;
 
+  readonly options: S | (T & S) | Record<string, any>;
 
-  readonly options: T;
-
-  constructor(options: T, defaultOptions: T) {
-    this.options = {...options , ...defaultOptions};
+  protected constructor(options: T, defaultOptions: S) {
+    this.options = {...(defaultOptions || {}), ...(options || {})};
   }
 
   search(needleWords: string[], haystackWords: string[]): void {

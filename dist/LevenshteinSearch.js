@@ -1,12 +1,12 @@
 import BaseSearch from './BaseSearch';
 import levenshtein from './libs/levenshtein';
+const defaultOptions = {
+    maxLevenshteinDistance: 2,
+    minNeedleWordLength: 3,
+    levenshtein
+};
 class LevenshteinSearch extends BaseSearch {
     constructor(options) {
-        const defaultOptions = {
-            minNeedleWordLength: 2,
-            maxLevenshteinDistance: 3,
-            levenshtein,
-        };
         super(options, defaultOptions);
     }
     getScore() {
@@ -15,6 +15,10 @@ class LevenshteinSearch extends BaseSearch {
     search(needleWords, haystackWords) {
         const needleWordsFiltered = needleWords.filter(i => this.options.minNeedleWordLength <= i.length);
         const wordWeight = 1 / haystackWords.length;
+        if (needleWordsFiltered.length <= 0) {
+            this.searchScore = 1;
+            return;
+        }
         const scores = needleWordsFiltered.map(needle => {
             const bestNeedleScore = [0];
             haystackWords.forEach(haystack => {

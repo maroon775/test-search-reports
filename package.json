@@ -1,10 +1,11 @@
 {
   "name": "@maroon775/levenshtein-search",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "Run project with `node --experimental-json-modules ./example/example.js` Or: `npm run example`",
   "main": "src/index.ts",
   "module": "src/index.ts",
   "scripts": {
+    "test": "jest",
     "lint": "eslint src --ext .ts,.js --cache",
     "build:ts": "tsc --pretty",
     "start": "node .",
@@ -36,6 +37,23 @@
     "prettier": "^2.4.1"
   },
   "devDependencies": {
+    "@types/jest": "^27.0.2",
+    "jest": "^27.2.5",
+    "ts-jest": "^27.0.5",
     "typescript": "^4.4.3"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.ts?$": "ts-jest"
+    },
+    "testRegex": "(tests/.*|(\\.|/)(test|spec))\\.(js|ts)$",
+    "testPathIgnorePatterns": [
+      "tests/mock.ts"
+    ],
+    "moduleFileExtensions": [
+      "ts",
+      "js",
+      "json"
+    ]
   }
 }

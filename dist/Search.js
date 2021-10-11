@@ -1,14 +1,15 @@
 import stringToArray from './libs/stringToArray';
+const defaultOptions = {
+    caseSensitive: false,
+    fields: [{
+            key: 'title',
+            weight: 1,
+        }],
+};
 class SearchInit {
     constructor(dataItems, options) {
         this.modules = [];
-        this.options = {
-            caseSensitive: false,
-            fields: [{
-                    key: 'title',
-                    weight: 1,
-                }],
-        };
+        this.options = defaultOptions;
         if (!('fields' in options)
             || !Array.isArray(options.fields)
             || options.fields.length <= 0) {
@@ -18,7 +19,7 @@ class SearchInit {
             throw new Error('dataItems should be an array');
         }
         if (options) {
-            this.options = options;
+            this.options = Object.assign(Object.assign({}, defaultOptions), options);
         }
         this.dataset = this.createDataset(dataItems);
     }
@@ -66,9 +67,9 @@ class SearchInit {
         this.modules.push({ instance, name: Module.name });
     }
     search(queryString) {
-        if (!queryString)
+        if (!queryString || this.modules.length === 0)
             return this.dataset;
-        this.queryset = stringToArray(queryString, 1);
+        this.queryset = stringToArray(this.options.caseSensitive ? queryString : queryString.toLowerCase(), 1);
         const result = this.dataset.map(item => {
             item.__scorings = {
                 score: 0,
@@ -86,7 +87,9 @@ class SearchInit {
         const sliceIndex = result.findIndex(i => i.__scorings.score === 0);
         if (sliceIndex === 0)
             return [];
-        return result.slice(0, sliceIndex - 1);
+        if (sliceIndex === -1)
+            return result;
+        return result.slice(0, sliceIndex);
     }
 }
 export default SearchInit;

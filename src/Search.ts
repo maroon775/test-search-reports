@@ -33,12 +33,12 @@ interface DatasetItemStructure extends Obj {
 }
 
 interface FieldsOptionItem {
-    key: string,
-    weight: number
+    key: string;
+    weight: number;
 }
 
 interface SearchInitOptions {
-    caseSensitive: false,
+    caseSensitive?: boolean;
     fields: FieldsOptionItem[]
 }
 
@@ -53,22 +53,24 @@ interface ISearchInit {
     dataset: DatasetItemStructure[];
     queryset: string[]
 
-    // createDataset(data: DatasetItemStructure[]): DatasetItemStructure[];
     search(queryString: string): DatasetItemStructure[];
 
-    addSearchModule<T, O>(Module: new (options: O) => T & BaseSearch, options: O): void;
+    addSearchModule<T>(Module: new () => T & BaseSearch): void;
+    addSearchModule<T, O>(Module: new (options: O) => T & BaseSearch<O>, options: O): void;
 }
+
+const defaultOptions:SearchInitOptions = {
+    caseSensitive: false,
+    fields: [{
+        key: 'title',
+        weight: 1,
+    }],
+};
 
 class SearchInit implements ISearchInit {
     modules: ModuleInstance[] = [];
 
-    options: SearchInitOptions = {
-        caseSensitive: false,
-        fields: [{
-            key: 'title',
-            weight: 1,
-        }],
-    };
+    options: SearchInitOptions = defaultOptions;
 
     dataset;
 
@@ -86,7 +88,7 @@ class SearchInit implements ISearchInit {
         }
 
         if (options) {
-            this.options = options;
+            this.options = {...defaultOptions, ...options};
         }
 
         this.dataset = this.createDataset(dataItems);
@@ -139,15 +141,15 @@ class SearchInit implements ISearchInit {
         return a > b ? -1 : 1;
     }
 
-    addSearchModule<T, O>(Module: new(options: O) => T & BaseSearch, options: O): void {
+    addSearchModule<T, O>(Module: new(options?: O) => T & BaseSearch<O>, options?: O): void {
         const instance = new Module(options);
         this.modules.push({instance, name: Module.name});
     }
 
     search(queryString: string): DatasetItemStructure[] {
-        if (!queryString) return this.dataset;
+        if (!queryString || this.modules.length === 0) return this.dataset;
 
-        this.queryset = stringToArray(queryString, 1);
+        this.queryset = stringToArray(this.options.caseSensitive ? queryString : queryString.toLowerCase(), 1);
 
         const result = this.dataset.map(item => {
             item.__scorings = {
@@ -169,8 +171,9 @@ class SearchInit implements ISearchInit {
         const sliceIndex = result.findIndex(i => i.__scorings.score === 0);
 
         if (sliceIndex === 0) return [];
+        if (sliceIndex === -1) return result;
 
-        return result.slice(0, sliceIndex - 1);
+        return result.slice(0, sliceIndex);
     }
 }
 

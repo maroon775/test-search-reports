@@ -2,14 +2,19 @@ import BaseSearch from './BaseSearch';
 import arraySumValues from './libs/arraySumValues';
 
 interface IMatchSearchOptions {
-    minNeedleWordLength: number,
+    minNeedleWordLength?: number;
+    strict?: boolean
 }
+const defaultOptions = {
+    minNeedleWordLength: 2,
+    strict: false
+};
 
-class MatchSearch extends BaseSearch<IMatchSearchOptions> {
-    constructor(options: IMatchSearchOptions) {
-        const defaultOptions: IMatchSearchOptions = {
-            minNeedleWordLength: 2,
-        };
+type MatchSearchDefaults = typeof defaultOptions;
+
+
+class MatchSearch extends BaseSearch<IMatchSearchOptions | undefined, MatchSearchDefaults> {
+    constructor(options: IMatchSearchOptions| undefined) {
         super(options, defaultOptions);
     }
 
@@ -21,12 +26,17 @@ class MatchSearch extends BaseSearch<IMatchSearchOptions> {
         const needleWordsFiltered = needleWords.filter(i => this.options.minNeedleWordLength <= i.length);
         const wordWeight = 1 / haystackWords.length;
 
+        if(needleWordsFiltered.length <= 0) {
+            this.searchScore = 1;
+            return;
+        }
+
         const scores = needleWordsFiltered.map(needle => {
             const needleScores = haystackWords.map((haystack) => {
                 if (needle.trim() === haystack.trim()) {
                     return wordWeight;
                 }
-                if (haystack.includes(needle)) {
+                if (!this.options.strict && haystack.includes(needle)) {
                     return wordWeight * (needle.length / haystack.length);
                 }
                 return 0;

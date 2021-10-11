@@ -3,19 +3,20 @@ import levenshtein from './libs/levenshtein';
 
 
 interface ILevenshteinSearchOptions {
-    maxLevenshteinDistance: number,
-    minNeedleWordLength: number,
-
-    levenshtein(a: string, b: string): number
+    maxLevenshteinDistance?: number;
+    minNeedleWordLength?: number;
+    levenshtein?: (a: string, b: string) => number;
+}
+const defaultOptions = {
+    maxLevenshteinDistance: 2,
+    minNeedleWordLength: 3,
+    levenshtein
 }
 
-class LevenshteinSearch extends BaseSearch<ILevenshteinSearchOptions> {
-    constructor(options: ILevenshteinSearchOptions) {
-        const defaultOptions: ILevenshteinSearchOptions = {
-            minNeedleWordLength: 2,
-            maxLevenshteinDistance: 3,
-            levenshtein,
-        }
+type LevenshteinSearchDefaults = typeof defaultOptions;
+
+class LevenshteinSearch extends BaseSearch<ILevenshteinSearchOptions | undefined, LevenshteinSearchDefaults> {
+    constructor(options: ILevenshteinSearchOptions | undefined) {
         super(options, defaultOptions);
     }
 
@@ -26,6 +27,11 @@ class LevenshteinSearch extends BaseSearch<ILevenshteinSearchOptions> {
     search(needleWords: string[], haystackWords: string[]): void {
         const needleWordsFiltered = needleWords.filter(i => this.options.minNeedleWordLength <= i.length);
         const wordWeight = 1 / haystackWords.length;
+
+        if(needleWordsFiltered.length <= 0) {
+            this.searchScore = 1;
+            return;
+        }
 
         const scores = needleWordsFiltered.map(needle => {
             const bestNeedleScore = [0];
