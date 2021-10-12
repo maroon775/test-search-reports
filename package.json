@@ -7,8 +7,7 @@
   "scripts": {
     "test": "jest",
     "lint": "eslint src --ext .ts,.js --cache",
-    "build:ts": "tsc --pretty",
-    "start": "node .",
+    "build:ts": "tsc --pretty"
   },
   "author": "maroon775",
   "type": "module",
