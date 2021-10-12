@@ -1,7 +1,7 @@
 {
   "name": "@maroon775/levenshtein-search",
-  "version": "1.1.7",
-  "description": "Run project with `node --experimental-json-modules ./example/example.js` Or: `npm run example`",
+  "version": "1.1.8",
+  "description": "Test package @maroon775/levenshtein-search",
   "main": "src/index.ts",
   "module": "src/index.ts",
   "scripts": {
@@ -9,14 +9,10 @@
     "lint": "eslint src --ext .ts,.js --cache",
     "build:ts": "tsc --pretty",
     "start": "node .",
-    "example": "node --experimental-json-modules example/example.js"
   },
   "author": "maroon775",
   "type": "module",
   "license": "ISC",
-  "directories": {
-    "example": "example"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/maroon775/test-search-reports.git"
